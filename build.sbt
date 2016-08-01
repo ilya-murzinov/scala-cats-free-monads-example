@@ -56,10 +56,16 @@ val cakeServer = (project in file("cake-server"))
   .settings(name := "cake-weather-server")
   .dependsOn(common)
 
+val freeServer = (project in file("free-server"))
+  .enablePlugins(AutomateHeaderPlugin)
+  .settings(commonSettings)
+  .settings(name := "free-weather-server")
+  .dependsOn(common)
+
 val root = (project in file("."))
   .settings(commonSettings)
   .settings(publishArtifact := false)
-  .aggregate(common, cakeServer)
+  .aggregate(common, cakeServer, freeServer)
 
 // Validate the project
 val validateCommands = List(

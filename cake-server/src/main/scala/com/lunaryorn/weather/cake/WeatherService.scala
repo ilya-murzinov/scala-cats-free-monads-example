@@ -17,29 +17,11 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.{Xor, XorT}
-import com.lunaryorn.weather.WeatherRepositoryComponent
+import com.lunaryorn.weather.{TemperatureError, WeatherRepositoryComponent}
 import com.twitter.util.Future
 import io.catbird.util._
-import io.circe.generic.semiauto._
-import io.circe.{Decoder, ObjectEncoder}
+import squants.Temperature
 import squants.thermal.TemperatureConversions._
-import squants.{QuantityRange, Temperature}
-
-sealed trait TemperatureError
-case class TemperatureOutOfBoundsError(range: QuantityRange[Temperature])
-    extends TemperatureError
-
-object TemperatureError {
-  object Codecs {
-    import com.lunaryorn.weather.json._
-
-    implicit val encodeTemperatureError: ObjectEncoder[TemperatureError] =
-      deriveEncoder[TemperatureError]
-
-    implicit val decodeTemperatureError: Decoder[TemperatureError] =
-      deriveDecoder[TemperatureError]
-  }
-}
 
 trait WeatherService {
   def addTemperature(
@@ -65,8 +47,8 @@ trait WeatherServiceComponentImpl { self: WeatherRepositoryComponent =>
       (if (temperatureRange.contains(temperature)) {
          XorT.right(weatherRepository.addTemperature(temperature))
        } else {
-         XorT.fromXor[Future](
-             Xor.left(TemperatureOutOfBoundsError(temperatureRange)))
+         XorT.fromXor[Future](Xor.left(TemperatureError
+                   .TemperatureOutOfBoundsError(temperatureRange)))
        }).value
 
     override def getTemperatures: Future[Seq[Temperature]] =

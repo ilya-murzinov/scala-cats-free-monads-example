@@ -17,7 +17,8 @@
 package com.lunaryorn.weather
 
 import com.twitter.util.Future
-import squants.Temperature
+import squants.{Temperature, thermal}
+
 import scala.collection.mutable
 
 trait WeatherRepository {
@@ -29,7 +30,9 @@ trait WeatherRepository {
 
 class InMemoryWeatherRepository extends WeatherRepository {
   private lazy val temperatures: mutable.ArrayBuffer[Temperature] =
-    mutable.ArrayBuffer.empty
+    mutable.ArrayBuffer(thermal.AbsoluteZero,
+                        thermal.FreezingTemperatureWater,
+                        thermal.BoilingTemperatureWater)
 
   override def addTemperature(temperature: Temperature): Future[Temperature] = {
     temperatures += temperature

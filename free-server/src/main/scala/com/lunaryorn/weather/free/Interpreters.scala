@@ -14,29 +14,23 @@
  * limitations under the License.
  */
 
-package com.lunaryorn.weather
+package com.lunaryorn.weather.free
 
+import cats.~>
+import com.lunaryorn.weather.WeatherRepository
 import com.twitter.util.Future
-import squants.Temperature
 
-import scala.collection.mutable
+object Interpreters {
+  import TemperatureActionT._
 
-trait WeatherRepository {
-
-  def addTemperature(temperature: Temperature): Future[Temperature]
-
-  def getTemperatures: Future[Seq[Temperature]]
-}
-
-class InMemoryWeatherRepository extends WeatherRepository {
-  private lazy val temperatures: mutable.ArrayBuffer[Temperature] =
-    mutable.ArrayBuffer()
-
-  override def addTemperature(temperature: Temperature): Future[Temperature] = {
-    temperatures += temperature
-    Future.value(temperature)
-  }
-
-  override def getTemperatures: Future[Seq[Temperature]] =
-    Future.value(temperatures)
+  def interpretWithRepository(
+      repo: WeatherRepository
+  ): TemperatureActionT ~> Future =
+    new (TemperatureActionT ~> Future) {
+      override def apply[A](action: TemperatureActionT[A]): Future[A] =
+        action match {
+          case GetAll => repo.getTemperatures
+          case Store(temperature) => repo.addTemperature(temperature)
+        }
+    }
 }

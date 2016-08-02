@@ -37,5 +37,5 @@ object TemperatureAction {
   def store(temperature: Temperature): TemperatureAction[Temperature] =
     liftF(TemperatureActionT.Store(temperature))
 
-  def pure[T](t: T): TemperatureAction[T] = Free.pure(t)
+  def const[T](t: T): TemperatureAction[T] = Free.pure(t)
 }

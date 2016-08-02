@@ -28,7 +28,7 @@ class WeatherService(temperatureRange: QuantityRange[Temperature]) {
       store(temperature).map(Xor.right)
     } else {
       import com.lunaryorn.weather.TemperatureError._
-      pure(Xor.left(TemperatureOutOfBoundsError(temperatureRange)))
+      const(Xor.left(TemperatureOutOfBoundsError(temperatureRange)))
     }
 
   def getTemperatures: TemperatureAction[Seq[Temperature]] = getAll

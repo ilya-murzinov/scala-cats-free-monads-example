@@ -38,9 +38,8 @@ object CakeServer
   val postTemperature: Endpoint[Xor[TemperatureError, Temperature]] =
     post("temperatures" :: body.as[Temperature]) { temperature: Temperature =>
       weatherService.addTemperature(temperature).map {
-        case Xor.Right(newTemperature) => Ok(Xor.right(newTemperature))
-        case Xor.Left(error) =>
-          Output.payload(Xor.left(error), Status.BadRequest)
+        case r @ Xor.Right(_) => Ok(r)
+        case l @ Xor.Left(error) => Output.payload(l, Status.BadRequest)
       }
     }
 

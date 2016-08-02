@@ -43,9 +43,8 @@ object FreeServer extends App {
     post("temperatures" :: body.as[Temperature]).map {
       temperature: Temperature =>
         weatherService.addTemperature(temperature).map {
-          case Xor.Right(temperature) => Created(Xor.right(temperature))
-          case Xor.Left(error) =>
-            Output.payload(Xor.left(error), Status.BadRequest)
+          case r @ Xor.Right(_) => Created(r)
+          case l @ Xor.Left(_) => Output.payload(l, Status.BadRequest)
         }
     }
 

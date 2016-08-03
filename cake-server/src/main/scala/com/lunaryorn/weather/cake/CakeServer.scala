@@ -16,13 +16,12 @@
 
 package com.lunaryorn.weather.cake
 
-import cats.data.Xor
+import cats.data.XorT
+import com.lunaryorn.weather.InMemoryWeatherRepositoryComponentImpl
 import com.lunaryorn.weather.json._
-import com.lunaryorn.weather.{InMemoryWeatherRepositoryComponentImpl, TemperatureError}
-import com.lunaryorn.weather.TemperatureError.Codecs._
 import com.twitter.finagle.Http
-import com.twitter.finagle.http.Status
 import com.twitter.util.Await
+import io.catbird.util._
 import io.finch._
 import io.finch.circe._
 import squants.UnitOfMeasure
@@ -35,12 +34,10 @@ object CakeServer
 
   import com.lunaryorn.weather.codecs.encodeException
 
-  val postTemperature: Endpoint[Xor[TemperatureError, Temperature]] =
+  val postTemperature: Endpoint[Temperature] =
     post("temperatures" :: body.as[Temperature]) { temperature: Temperature =>
-      weatherService.addTemperature(temperature).map {
-        case r @ Xor.Right(_) => Ok(r)
-        case l @ Xor.Left(error) => Output.payload(l, Status.BadRequest)
-      }
+      XorT(weatherService.addTemperature(temperature))
+        .fold(BadRequest, Created)
     }
 
   val getTemperatures: Endpoint[Seq[Temperature]] = {

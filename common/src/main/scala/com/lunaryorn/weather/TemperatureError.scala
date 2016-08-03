@@ -20,7 +20,7 @@ import io.circe.{Decoder, ObjectEncoder}
 import io.circe.generic.semiauto._
 import squants.{QuantityRange, Temperature}
 
-sealed trait TemperatureError
+sealed trait TemperatureError extends Exception
 
 object TemperatureError {
 

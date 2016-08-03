@@ -16,7 +16,7 @@
 
 package com.lunaryorn.weather.free
 
-import cats.data.Xor
+import cats.data.{Xor, XorT}
 import com.lunaryorn.weather.free.TemperatureAction.TemperatureAction
 import com.lunaryorn.weather.{InMemoryWeatherRepository, TemperatureError}
 import com.twitter.finagle.Http
@@ -39,13 +39,11 @@ object FreeServer extends App {
 
   type TemperatureEndpoint[T] = Endpoint[TemperatureAction[Output[T]]]
 
-  val postTemperature: TemperatureEndpoint[Xor[TemperatureError, Temperature]] =
+  val postTemperature: TemperatureEndpoint[Temperature] =
     post("temperatures" :: body.as[Temperature]).map {
       temperature: Temperature =>
-        weatherService.addTemperature(temperature).map {
-          case r @ Xor.Right(_) => Created(r)
-          case l @ Xor.Left(_) => Output.payload(l, Status.BadRequest)
-        }
+        XorT(weatherService.addTemperature(temperature))
+          .fold(BadRequest, Created)
     }
 
   val getTemperatures: TemperatureEndpoint[Seq[Temperature]] = {

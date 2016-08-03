@@ -45,7 +45,7 @@ val common = (project in file("common"))
     name := "weather-common",
     libraryDependencies ++= Seq(
       "com.squants" %% "squants" % "0.6.2",
-      "org.scalatest" %% "scalatest" % "3.0.0-RC4" % "test",
+      "org.scalatest" %% "scalatest" % "3.0.0" % "test",
       "org.scalacheck" %% "scalacheck" % "1.13.2" % "test"
     ) ++ Dependencies.circe ++ Dependencies.finch ++ Dependencies.cats
   )

@@ -15,25 +15,13 @@
  */
 
 package com.lunaryorn.weather
+import squants.thermal.TemperatureConversions._
 
-import io.circe.{Decoder, ObjectEncoder}
-import io.circe.generic.semiauto._
-import squants.{QuantityRange, Temperature}
+trait TemperatureValidatorComponent {
+  def temperatureValidator: TemperatureValidator
+}
 
-sealed trait TemperatureError
-
-object TemperatureError {
-  import TemperatureValidationError.Codecs._
-
-  case class InvalidTemperature(error: TemperatureValidationError)
-      extends TemperatureError
-
-  def toRequestError(error: TemperatureError): RequestError[_] =
-    error match {
-      case InvalidTemperature(validationError) =>
-        RequestError.apply("error.temperature.invalid",
-                           "Invalid temperature",
-                           Some(validationError))
-    }
-
+trait TemperatureValidatorComponentImpl extends TemperatureValidatorComponent {
+  val temperatureValidator: TemperatureValidator =
+    new TemperatureRangeValidator(-100.degreesCelsius to 150.degreesCelsius)
 }

@@ -16,20 +16,19 @@
 
 package com.lunaryorn.weather.free
 
-import cats.data.Xor
-import com.lunaryorn.weather.TemperatureError
+import cats.data.{Xor, XorT}
+import com.lunaryorn.weather.{TemperatureError, TemperatureValidator}
 import com.lunaryorn.weather.free.TemperatureAction._
 import squants.{QuantityRange, Temperature}
 
-class TemperatureService(temperatureRange: QuantityRange[Temperature]) {
+class TemperatureService(validator: TemperatureValidator) {
   def addTemperature(temperature: Temperature)
     : TemperatureAction[Xor[TemperatureError, Temperature]] =
-    if (temperatureRange.contains(temperature)) {
-      store(temperature).map(Xor.right)
-    } else {
-      import com.lunaryorn.weather.TemperatureError._
-      const(Xor.left(TemperatureOutOfBoundsError(temperatureRange)))
-    }
+    XorT
+      .fromXor[TemperatureAction](validator.validate(temperature).toXor)
+      .leftMap(TemperatureError.InvalidTemperature)
+      .flatMap(t => XorT.right(store(t)) : XorT[TemperatureAction, TemperatureError, Temperature])
+      .value
 
   def getTemperatures: TemperatureAction[Seq[Temperature]] = getAll
 }

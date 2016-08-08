@@ -17,7 +17,7 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.XorT
-import com.lunaryorn.weather.{InMemoryTemperatureRepositoryComponentImpl, TemperatureError}
+import com.lunaryorn.weather.{InMemoryTemperatureRepositoryComponentImpl, TemperatureError, TemperatureValidatorComponentImpl}
 import com.lunaryorn.weather.json._
 import com.twitter.finagle.Http
 import com.twitter.util.Await
@@ -30,13 +30,14 @@ import squants.thermal._
 object CakeServer
     extends App
     with WeatherServiceComponentImpl
-    with InMemoryTemperatureRepositoryComponentImpl {
+    with InMemoryTemperatureRepositoryComponentImpl
+    with TemperatureValidatorComponentImpl {
 
   import com.lunaryorn.weather.codecs.encodeException
 
   val postTemperature: Endpoint[Temperature] =
     post("temperatures" :: body.as[Temperature]) { temperature: Temperature =>
-      XorT(weatherService.addTemperature(temperature))
+      XorT(temperatureService.addTemperature(temperature))
         .leftMap(TemperatureError.toRequestError)
         .fold(BadRequest, Created)
     }
@@ -46,7 +47,7 @@ object CakeServer
     get("temperatures" :: paramOption("unit").as[TemperatureScale]) {
       unit: Option[TemperatureScale] =>
         for {
-          temperatures <- weatherService.getTemperatures
+          temperatures <- temperatureService.getTemperatures
         } yield
           Ok(
               unit

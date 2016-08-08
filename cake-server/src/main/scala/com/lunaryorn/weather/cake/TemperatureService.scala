@@ -17,7 +17,7 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.{Xor, XorT}
-import com.lunaryorn.weather.{TemperatureError, TemperatureRepositoryComponent}
+import com.lunaryorn.weather.{TemperatureError, TemperatureRepositoryComponent, TemperatureValidatorComponent}
 import com.twitter.util.Future
 import io.catbird.util._
 import squants.Temperature
@@ -34,22 +34,23 @@ trait WeatherServiceComponent {
   def weatherService: TemperatureService
 }
 
-trait WeatherServiceComponentImpl { self: TemperatureRepositoryComponent =>
+trait WeatherServiceComponentImpl {
+  self: TemperatureRepositoryComponent with TemperatureValidatorComponent =>
 
-  val weatherService: TemperatureService = new WeatherServiceImpl
-
-  val temperatureRange = -100.degreesCelsius.to(150.degreesCelsius)
+  val temperatureService: TemperatureService = new WeatherServiceImpl
 
   private class WeatherServiceImpl extends TemperatureService {
     override def addTemperature(
-        temperature: Temperature
-    ): Future[Xor[TemperatureError, Temperature]] =
-      (if (temperatureRange.contains(temperature)) {
-         XorT.right(weatherRepository.addTemperature(temperature))
-       } else {
-         XorT.fromXor[Future](Xor.left(TemperatureError
-                   .TemperatureOutOfBoundsError(temperatureRange)))
-       }).value
+        temperature: Temperature): Future[Xor[TemperatureError, Temperature]] =
+      XorT
+        .fromXor[Future](temperatureValidator.validate(temperature).toXor)
+        .leftMap(TemperatureError.InvalidTemperature)
+        .flatMap(t =>
+              XorT.right(weatherRepository.addTemperature(temperature)): XorT[
+                  Future,
+                  TemperatureError,
+                  Temperature])
+        .value
 
     override def getTemperatures: Future[Seq[Temperature]] =
       weatherRepository.getTemperatures

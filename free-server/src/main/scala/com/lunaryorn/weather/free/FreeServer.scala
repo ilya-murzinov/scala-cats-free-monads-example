@@ -18,7 +18,7 @@ package com.lunaryorn.weather.free
 
 import cats.data.{Xor, XorT}
 import com.lunaryorn.weather.free.TemperatureAction.TemperatureAction
-import com.lunaryorn.weather.{InMemoryTemperatureRepository, TemperatureError}
+import com.lunaryorn.weather.{InMemoryTemperatureRepository, TemperatureError, TemperatureRangeValidator}
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Status
 import com.twitter.util.Await
@@ -32,10 +32,9 @@ import squants.{Temperature, UnitOfMeasure}
 object FreeServer extends App {
   import com.lunaryorn.weather.codecs.encodeException
   import com.lunaryorn.weather.json._
-  import TemperatureError.Codecs._
 
   val weatherService = new TemperatureService(
-      -100.degreesCelsius to 150.degreesCelsius)
+      new TemperatureRangeValidator(-100.degreesCelsius to 150.degreesCelsius))
   val repository = new InMemoryTemperatureRepository
 
   type TemperatureEndpoint[T] = Endpoint[TemperatureAction[Output[T]]]

@@ -18,17 +18,18 @@ package com.lunaryorn.weather
 
 import com.twitter.util.Try
 import io.circe.syntax._
-import squants.thermal.Temperature
-import squants.{Temperature, UnitOfMeasure}
 import io.circe.{Encoder, Json, JsonObject, ObjectEncoder}
 import io.finch._
 import io.finch.items.RequestItem
+import squants.thermal.{Temperature, TemperatureScale}
 
 object codecs {
-  implicit val decodeUnitOfMeasureTemperature: Decode[
-      UnitOfMeasure[Temperature]] = Decode.instance { symbol =>
-    Try.orThrow(Temperature.units.find(_.symbol == symbol))(() =>
-          new IllegalArgumentException(s"Unknown unit symbol: $symbol"))
+  implicit val decodeTemperatureScale: Decode[TemperatureScale] = Decode.instance { symbol =>
+    for {
+      unit <- Try.orThrow(Temperature.units.find(_.symbol == symbol))(() =>
+        new IllegalArgumentException(s"Unknown unit symbol: $symbol"))
+      scale <- Try(unit.asInstanceOf[TemperatureScale])
+    } yield scale
   }
 
   private object FinchErrorEncoders {

@@ -42,15 +42,15 @@ object CakeServer
     }
 
   val getTemperatures: Endpoint[Seq[Temperature]] = {
-    import com.lunaryorn.weather.codecs.decodeUnitOfMeasureTemperature
-    get("temperatures" :: paramOption("unit").as[UnitOfMeasure[Temperature]]) {
-      unit: Option[UnitOfMeasure[Temperature]] =>
+    import com.lunaryorn.weather.codecs.decodeTemperatureScale
+    get("temperatures" :: paramOption("unit").as[TemperatureScale]) {
+      unit: Option[TemperatureScale] =>
         for {
           temperatures <- weatherService.getTemperatures
         } yield
           Ok(
               unit
-                .map(unit => temperatures.map(t => unit(t.to(unit))))
+                .map(unit => temperatures.map(t => t.in(unit)))
                 .getOrElse(temperatures))
     }
   }

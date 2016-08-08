@@ -26,6 +26,7 @@ import io.catbird.util._
 import io.finch._
 import io.finch.circe._
 import squants.thermal.TemperatureConversions._
+import squants.thermal.TemperatureScale
 import squants.{Temperature, UnitOfMeasure}
 
 object FreeServer extends App {
@@ -48,15 +49,15 @@ object FreeServer extends App {
     }
 
   val getTemperatures: TemperatureEndpoint[Seq[Temperature]] = {
-    import com.lunaryorn.weather.codecs.decodeUnitOfMeasureTemperature
-    get("temperatures" :: paramOption("unit").as[UnitOfMeasure[Temperature]]).map {
-      unit: Option[UnitOfMeasure[Temperature]] =>
+    import com.lunaryorn.weather.codecs.decodeTemperatureScale
+    get("temperatures" :: paramOption("unit").as[TemperatureScale]).map {
+      unit: Option[TemperatureScale] =>
         for {
           temperatures <- weatherService.getTemperatures
         } yield
           Ok(
               unit
-                .map(unit => temperatures.map(t => unit(t.to(unit))))
+                .map(unit => temperatures.map(t => t.in(unit)))
                 .getOrElse(temperatures))
     }
   }

@@ -17,11 +17,12 @@
 package com.lunaryorn.weather
 
 import com.twitter.util.Try
-import io.circe.{JsonObject, ObjectEncoder}
 import io.circe.syntax._
-import io.finch.Decode
 import squants.thermal.Temperature
 import squants.{Temperature, UnitOfMeasure}
+import io.circe.{Encoder, Json, JsonObject, ObjectEncoder}
+import io.finch._
+import io.finch.items.RequestItem
 
 object codecs {
   implicit val decodeUnitOfMeasureTemperature: Decode[
@@ -30,10 +31,63 @@ object codecs {
           new IllegalArgumentException(s"Unknown unit symbol: $symbol"))
   }
 
-  implicit val encodeException: ObjectEncoder[Exception] =
-    ObjectEncoder.instance[Exception] { exception =>
-      JsonObject.empty
-        .add("type", exception.getClass.getName.asJson)
-        .add("message", exception.getMessage.asJson)
+  private object FinchErrorEncoders {
+    private implicit val encodeRequestItem: Encoder[RequestItem] =
+      Encoder.instance(_.description.asJson)
+
+    implicit val encodeErrorNotPresent: ObjectEncoder[Error.NotPresent] =
+      ObjectEncoder.instance { error =>
+        JsonObject.empty
+          .add("item", error.item.asJson)
+          .add("type", "Error.NotPresent".asJson)
+      }
+
+    implicit val encodeErrorNotParsed: ObjectEncoder[Error.NotParsed] =
+      ObjectEncoder.instance { error =>
+        JsonObject.empty
+          .add("item", error.item.asJson)
+          .add("target", error.targetType.runtimeClass.getSimpleName.asJson)
+          .add("type", "Error.NotParsed".asJson)
+      }
+
+    implicit val encodeErrorNotValid: ObjectEncoder[Error.NotValid] =
+      ObjectEncoder.instance { error =>
+        JsonObject.empty
+          .add("item", error.item.asJson)
+          .add("rule", error.rule.asJson)
+          .add("type", "Error.NotValid".asJson)
+      }
+  }
+
+  private def toRequestError(t: Throwable): Seq[RequestError[_]] = t match {
+    case error: RequestError[_] => Seq(error)
+    case error: Error.NotPresent =>
+      import FinchErrorEncoders._
+      Seq(
+          RequestError("error.request.notPresent",
+                       error.getMessage(),
+                       Some(error)))
+    case error: Error.NotParsed =>
+      import FinchErrorEncoders._
+      Seq(
+          RequestError("error.request.notParsed",
+                       error.getMessage(),
+                       Some(error)))
+    case error: Error.NotValid =>
+      import FinchErrorEncoders._
+      Seq(
+          RequestError("error.request.notValid",
+                       error.getMessage(),
+                       Some(error)))
+    case error: Error.RequestErrors =>
+      error.errors.flatMap(toRequestError)
+    case _ => Seq(RequestError("exception", t.getMessage))
+  }
+
+  implicit val encodeException: Encoder[Exception] =
+    Encoder.instance[Exception] { exception =>
+      val errors = toRequestError(exception).map(
+          RequestError.Codecs.encodeRequestError(_))
+      Json.arr(errors: _*)
     }
 }

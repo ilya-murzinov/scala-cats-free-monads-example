@@ -20,12 +20,22 @@ import io.circe.{Decoder, ObjectEncoder}
 import io.circe.generic.semiauto._
 import squants.{QuantityRange, Temperature}
 
-sealed trait TemperatureError extends Exception
+sealed trait TemperatureError
 
 object TemperatureError {
 
   case class TemperatureOutOfBoundsError(range: QuantityRange[Temperature])
       extends TemperatureError
+
+  def toRequestError(error: TemperatureError): RequestError[TemperatureError] = {
+    import Codecs._
+    error match {
+      case TemperatureOutOfBoundsError(_) =>
+        RequestError.apply("error.temperature.outOfBounds",
+                           "Temperature out of bounds",
+                           Some(error))
+    }
+  }
 
   object Codecs {
     import com.lunaryorn.weather.json._

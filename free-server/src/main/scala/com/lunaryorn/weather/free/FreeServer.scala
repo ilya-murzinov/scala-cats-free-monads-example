@@ -43,6 +43,7 @@ object FreeServer extends App {
     post("temperatures" :: body.as[Temperature]).map {
       temperature: Temperature =>
         XorT(weatherService.addTemperature(temperature))
+          .leftMap(TemperatureError.toRequestError)
           .fold(BadRequest, Created)
     }
 

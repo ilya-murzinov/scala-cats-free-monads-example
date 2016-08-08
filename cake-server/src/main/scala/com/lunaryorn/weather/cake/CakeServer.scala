@@ -17,7 +17,7 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.XorT
-import com.lunaryorn.weather.InMemoryWeatherRepositoryComponentImpl
+import com.lunaryorn.weather.{InMemoryWeatherRepositoryComponentImpl, TemperatureError}
 import com.lunaryorn.weather.json._
 import com.twitter.finagle.Http
 import com.twitter.util.Await
@@ -37,6 +37,7 @@ object CakeServer
   val postTemperature: Endpoint[Temperature] =
     post("temperatures" :: body.as[Temperature]) { temperature: Temperature =>
       XorT(weatherService.addTemperature(temperature))
+        .leftMap(TemperatureError.toRequestError)
         .fold(BadRequest, Created)
     }
 

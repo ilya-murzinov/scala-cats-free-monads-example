@@ -17,13 +17,13 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.{Xor, XorT}
-import com.lunaryorn.weather.{TemperatureError, WeatherRepositoryComponent}
+import com.lunaryorn.weather.{TemperatureError, TemperatureRepositoryComponent}
 import com.twitter.util.Future
 import io.catbird.util._
 import squants.Temperature
 import squants.thermal.TemperatureConversions._
 
-trait WeatherService {
+trait TemperatureService {
   def addTemperature(
       temperature: Temperature): Future[Xor[TemperatureError, Temperature]]
 
@@ -31,16 +31,16 @@ trait WeatherService {
 }
 
 trait WeatherServiceComponent {
-  def weatherService: WeatherService
+  def weatherService: TemperatureService
 }
 
-trait WeatherServiceComponentImpl { self: WeatherRepositoryComponent =>
+trait WeatherServiceComponentImpl { self: TemperatureRepositoryComponent =>
 
-  val weatherService: WeatherService = new WeatherServiceImpl
+  val weatherService: TemperatureService = new WeatherServiceImpl
 
   val temperatureRange = -100.degreesCelsius.to(150.degreesCelsius)
 
-  private class WeatherServiceImpl extends WeatherService {
+  private class WeatherServiceImpl extends TemperatureService {
     override def addTemperature(
         temperature: Temperature
     ): Future[Xor[TemperatureError, Temperature]] =

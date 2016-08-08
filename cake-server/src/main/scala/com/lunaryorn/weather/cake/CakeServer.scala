@@ -17,7 +17,7 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.XorT
-import com.lunaryorn.weather.{InMemoryWeatherRepositoryComponentImpl, TemperatureError}
+import com.lunaryorn.weather.{InMemoryTemperatureRepositoryComponentImpl, TemperatureError}
 import com.lunaryorn.weather.json._
 import com.twitter.finagle.Http
 import com.twitter.util.Await
@@ -30,7 +30,7 @@ import squants.thermal._
 object CakeServer
     extends App
     with WeatherServiceComponentImpl
-    with InMemoryWeatherRepositoryComponentImpl {
+    with InMemoryTemperatureRepositoryComponentImpl {
 
   import com.lunaryorn.weather.codecs.encodeException
 

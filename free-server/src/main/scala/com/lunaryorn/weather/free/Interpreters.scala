@@ -17,14 +17,14 @@
 package com.lunaryorn.weather.free
 
 import cats.~>
-import com.lunaryorn.weather.WeatherRepository
+import com.lunaryorn.weather.TemperatureRepository
 import com.twitter.util.Future
 
 object Interpreters {
   import TemperatureActionT._
 
-  def interpretWithRepository(
-      repo: WeatherRepository
+  def interpretTemperatureActionWithRepository(
+      repo: TemperatureRepository
   ): TemperatureActionT ~> Future =
     new (TemperatureActionT ~> Future) {
       override def apply[A](action: TemperatureActionT[A]): Future[A] =

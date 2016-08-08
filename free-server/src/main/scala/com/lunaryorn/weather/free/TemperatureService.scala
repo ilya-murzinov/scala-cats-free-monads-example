@@ -21,7 +21,7 @@ import com.lunaryorn.weather.TemperatureError
 import com.lunaryorn.weather.free.TemperatureAction._
 import squants.{QuantityRange, Temperature}
 
-class WeatherService(temperatureRange: QuantityRange[Temperature]) {
+class TemperatureService(temperatureRange: QuantityRange[Temperature]) {
   def addTemperature(temperature: Temperature)
     : TemperatureAction[Xor[TemperatureError, Temperature]] =
     if (temperatureRange.contains(temperature)) {

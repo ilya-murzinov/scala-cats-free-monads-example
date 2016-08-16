@@ -17,7 +17,11 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.XorT
-import com.lunaryorn.weather.{InMemoryTemperatureRepositoryComponentImpl, TemperatureError, TemperatureValidatorComponentImpl}
+import com.lunaryorn.weather.{
+  InMemoryTemperatureRepositoryComponentImpl,
+  TemperatureError,
+  TemperatureValidatorComponentImpl
+}
 import com.lunaryorn.weather.json._
 import com.twitter.finagle.Http
 import com.twitter.util.Await
@@ -50,9 +54,9 @@ object CakeServer
           temperatures <- temperatureService.getTemperatures
         } yield
           Ok(
-              unit
-                .map(unit => temperatures.map(t => t.in(unit)))
-                .getOrElse(temperatures))
+            unit
+              .map(unit => temperatures.map(t => t.in(unit)))
+              .getOrElse(temperatures))
     }
   }
 

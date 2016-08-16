@@ -27,7 +27,11 @@ class TemperatureService(validator: TemperatureValidator) {
     XorT
       .fromXor[TemperatureAction](validator.validate(temperature).toXor)
       .leftMap(TemperatureError.InvalidTemperature)
-      .flatMap(t => XorT.right(store(t)) : XorT[TemperatureAction, TemperatureError, Temperature])
+      .flatMap(
+        t =>
+          XorT.right(store(t)): XorT[TemperatureAction,
+                                     TemperatureError,
+                                     Temperature])
       .value
 
   def getTemperatures: TemperatureAction[Seq[Temperature]] = getAll

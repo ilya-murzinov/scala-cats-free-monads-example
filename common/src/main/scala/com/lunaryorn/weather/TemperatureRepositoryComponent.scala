@@ -22,5 +22,6 @@ trait TemperatureRepositoryComponent {
 
 trait InMemoryTemperatureRepositoryComponentImpl
     extends TemperatureRepositoryComponent {
-  lazy val weatherRepository: TemperatureRepository = new InMemoryTemperatureRepository
+  lazy val weatherRepository: TemperatureRepository =
+    new InMemoryTemperatureRepository
 }

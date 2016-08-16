@@ -32,7 +32,7 @@ object TemperatureValidationError {
     import com.lunaryorn.weather.json._
 
     implicit val encodeTemperatureValidationError: ObjectEncoder[
-        TemperatureValidationError] = deriveEncoder[TemperatureValidationError]
+      TemperatureValidationError] = deriveEncoder[TemperatureValidationError]
   }
 }
 

@@ -24,13 +24,14 @@ import io.finch.items.RequestItem
 import squants.thermal.{Temperature, TemperatureScale}
 
 object codecs {
-  implicit val decodeTemperatureScale: Decode[TemperatureScale] = Decode.instance { symbol =>
-    for {
-      unit <- Try.orThrow(Temperature.units.find(_.symbol == symbol))(() =>
-        new IllegalArgumentException(s"Unknown unit symbol: $symbol"))
-      scale <- Try(unit.asInstanceOf[TemperatureScale])
-    } yield scale
-  }
+  implicit val decodeTemperatureScale: Decode[TemperatureScale] =
+    Decode.instance { symbol =>
+      for {
+        unit <- Try.orThrow(Temperature.units.find(_.symbol == symbol))(() =>
+                 new IllegalArgumentException(s"Unknown unit symbol: $symbol"))
+        scale <- Try(unit.asInstanceOf[TemperatureScale])
+      } yield scale
+    }
 
   private object FinchErrorEncoders {
     private implicit val encodeRequestItem: Encoder[RequestItem] =
@@ -65,21 +66,21 @@ object codecs {
     case error: Error.NotPresent =>
       import FinchErrorEncoders._
       Seq(
-          RequestError("error.request.notPresent",
-                       error.getMessage(),
-                       Some(error)))
+        RequestError("error.request.notPresent",
+                     error.getMessage(),
+                     Some(error)))
     case error: Error.NotParsed =>
       import FinchErrorEncoders._
       Seq(
-          RequestError("error.request.notParsed",
-                       error.getMessage(),
-                       Some(error)))
+        RequestError("error.request.notParsed",
+                     error.getMessage(),
+                     Some(error)))
     case error: Error.NotValid =>
       import FinchErrorEncoders._
       Seq(
-          RequestError("error.request.notValid",
-                       error.getMessage(),
-                       Some(error)))
+        RequestError("error.request.notValid",
+                     error.getMessage(),
+                     Some(error)))
     case error: Error.RequestErrors =>
       error.errors.flatMap(toRequestError)
     case _ => Seq(RequestError("exception", t.getMessage))
@@ -88,7 +89,7 @@ object codecs {
   implicit val encodeException: Encoder[Exception] =
     Encoder.instance[Exception] { exception =>
       val errors = toRequestError(exception).map(
-          RequestError.Codecs.encodeRequestError(_))
+        RequestError.Codecs.encodeRequestError(_))
       Json.arr(errors: _*)
     }
 }

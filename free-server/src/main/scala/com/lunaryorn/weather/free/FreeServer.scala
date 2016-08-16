@@ -18,7 +18,11 @@ package com.lunaryorn.weather.free
 
 import cats.data.{Xor, XorT}
 import com.lunaryorn.weather.free.TemperatureAction.TemperatureAction
-import com.lunaryorn.weather.{InMemoryTemperatureRepository, TemperatureError, TemperatureRangeValidator}
+import com.lunaryorn.weather.{
+  InMemoryTemperatureRepository,
+  TemperatureError,
+  TemperatureRangeValidator
+}
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Status
 import com.twitter.util.Await
@@ -34,7 +38,7 @@ object FreeServer extends App {
   import com.lunaryorn.weather.json._
 
   val weatherService = new TemperatureService(
-      new TemperatureRangeValidator(-100.degreesCelsius to 150.degreesCelsius))
+    new TemperatureRangeValidator(-100.degreesCelsius to 150.degreesCelsius))
   val repository = new InMemoryTemperatureRepository
 
   type TemperatureEndpoint[T] = Endpoint[TemperatureAction[Output[T]]]
@@ -55,13 +59,14 @@ object FreeServer extends App {
           temperatures <- weatherService.getTemperatures
         } yield
           Ok(
-              unit
-                .map(unit => temperatures.map(t => t.in(unit)))
-                .getOrElse(temperatures))
+            unit
+              .map(unit => temperatures.map(t => t.in(unit)))
+              .getOrElse(temperatures))
     }
   }
 
-  val interpreter = Interpreters.interpretTemperatureActionWithRepository(repository)
+  val interpreter =
+    Interpreters.interpretTemperatureActionWithRepository(repository)
   def interpret[T](action: TemperatureAction[T]) = action.foldMap(interpreter)
   val endpoints = getTemperatures.mapOutputAsync(interpret) :+: postTemperature
       .mapOutputAsync(interpret)

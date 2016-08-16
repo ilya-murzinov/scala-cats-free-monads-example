@@ -17,7 +17,11 @@
 package com.lunaryorn.weather.cake
 
 import cats.data.{Xor, XorT}
-import com.lunaryorn.weather.{TemperatureError, TemperatureRepositoryComponent, TemperatureValidatorComponent}
+import com.lunaryorn.weather.{
+  TemperatureError,
+  TemperatureRepositoryComponent,
+  TemperatureValidatorComponent
+}
 import com.twitter.util.Future
 import io.catbird.util._
 import squants.Temperature
@@ -45,11 +49,12 @@ trait WeatherServiceComponentImpl {
       XorT
         .fromXor[Future](temperatureValidator.validate(temperature).toXor)
         .leftMap(TemperatureError.InvalidTemperature)
-        .flatMap(t =>
-              XorT.right(weatherRepository.addTemperature(temperature)): XorT[
-                  Future,
-                  TemperatureError,
-                  Temperature])
+        .flatMap(
+          t =>
+            XorT.right(weatherRepository.addTemperature(temperature)): XorT[
+              Future,
+              TemperatureError,
+              Temperature])
         .value
 
     override def getTemperatures: Future[Seq[Temperature]] =

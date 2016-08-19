@@ -16,21 +16,32 @@
 
 package com.lunaryorn.weather.free
 
-import cats.~>
-import com.lunaryorn.weather.TemperatureRepository
+import cats.{Id, ~>}
+import com.lunaryorn.weather.{TemperatureRepository, TemperatureValidator}
 import com.twitter.util.Future
 
 object Interpreters {
+  import TemperatureStoreActionT._
   import TemperatureActionT._
 
-  def interpretTemperatureActionWithRepository(
+  def interpretTemperatureStoreActionWithRepository(
       repo: TemperatureRepository
-  ): TemperatureActionT ~> Future =
-    new (TemperatureActionT ~> Future) {
-      override def apply[A](action: TemperatureActionT[A]): Future[A] =
+  ): TemperatureStoreActionT ~> Future =
+    new (TemperatureStoreActionT ~> Future) {
+      override def apply[A](action: TemperatureStoreActionT[A]): Future[A] =
         action match {
           case GetAll => repo.getTemperatures
           case Store(temperature) => repo.addTemperature(temperature)
         }
+    }
+
+  def interpretTemperatureActionWithValidator(
+      validator: TemperatureValidator): TemperatureActionT ~> Id =
+    new (TemperatureActionT ~> Id) {
+      override def apply[A](
+        action: TemperatureActionT[A]
+      ): Id[A] = action match {
+        case Validate(temperature) => validator.validate(temperature)
+      }
     }
 }

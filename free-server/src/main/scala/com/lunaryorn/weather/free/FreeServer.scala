@@ -17,7 +17,7 @@
 package com.lunaryorn.weather.free
 
 import cats.data.{Xor, XorT}
-import com.lunaryorn.weather.free.TemperatureAction.TemperatureAction
+import com.lunaryorn.weather.free.TemperatureStoreAction.TemperatureStoreAction
 import com.lunaryorn.weather.{
   InMemoryTemperatureRepository,
   TemperatureError,
@@ -41,7 +41,7 @@ object FreeServer extends App {
     new TemperatureRangeValidator(-100.degreesCelsius to 150.degreesCelsius))
   val repository = new InMemoryTemperatureRepository
 
-  type TemperatureEndpoint[T] = Endpoint[TemperatureAction[Output[T]]]
+  type TemperatureEndpoint[T] = Endpoint[TemperatureStoreAction[Output[T]]]
 
   val postTemperature: TemperatureEndpoint[Temperature] =
     post("temperatures" :: body.as[Temperature]).map {
@@ -65,9 +65,8 @@ object FreeServer extends App {
     }
   }
 
-  val interpreter =
-    Interpreters.interpretTemperatureActionWithRepository(repository)
-  def interpret[T](action: TemperatureAction[T]) = action.foldMap(interpreter)
+  val interpreter = Interpreters.interpretTemperatureStoreActionWithRepository(repository)
+  def interpret[T](action: TemperatureStoreAction[T]) = action.foldMap(interpreter)
   val endpoints = getTemperatures.mapOutputAsync(interpret) :+: postTemperature
       .mapOutputAsync(interpret)
 

@@ -18,21 +18,21 @@ package com.lunaryorn.weather.free
 
 import cats.data.{Xor, XorT}
 import com.lunaryorn.weather.{TemperatureError, TemperatureValidator}
-import com.lunaryorn.weather.free.TemperatureAction._
+import com.lunaryorn.weather.free.TemperatureStoreAction._
 import squants.{QuantityRange, Temperature}
 
 class TemperatureService(validator: TemperatureValidator) {
   def addTemperature(temperature: Temperature)
-    : TemperatureAction[Xor[TemperatureError, Temperature]] =
+    : TemperatureStoreAction[Xor[TemperatureError, Temperature]] =
     XorT
-      .fromXor[TemperatureAction](validator.validate(temperature).toXor)
+      .fromXor[TemperatureStoreAction](validator.validate(temperature).toXor)
       .leftMap(TemperatureError.InvalidTemperature)
       .flatMap(
         t =>
-          XorT.right(store(t)): XorT[TemperatureAction,
+          XorT.right(store(t)): XorT[TemperatureStoreAction,
                                      TemperatureError,
                                      Temperature])
       .value
 
-  def getTemperatures: TemperatureAction[Seq[Temperature]] = getAll
+  def getTemperatures: TemperatureStoreAction[Seq[Temperature]] = getAll
 }

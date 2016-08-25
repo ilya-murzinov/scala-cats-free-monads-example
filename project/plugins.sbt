@@ -2,4 +2,4 @@
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "1.6.0")
 
 // Formatting
-addSbtPlugin("com.geirsson" %% "sbt-scalafmt" % "0.3.0-RC1")
+addSbtPlugin("com.geirsson" %% "sbt-scalafmt" % "0.3.1")

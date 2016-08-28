@@ -28,7 +28,7 @@ object codecs {
     Decode.instance { symbol =>
       for {
         unit <- Try.orThrow(Temperature.units.find(_.symbol == symbol))(() =>
-                 new IllegalArgumentException(s"Unknown unit symbol: $symbol"))
+          new IllegalArgumentException(s"Unknown unit symbol: $symbol"))
         scale <- Try(unit.asInstanceOf[TemperatureScale])
       } yield scale
     }

@@ -26,18 +26,18 @@ import squants.{QuantityRange, UnitOfMeasure}
 object json {
 
   implicit val encodeTemperatureUnitOfMeasure: Encoder[
-      UnitOfMeasure[Temperature]] =
+    UnitOfMeasure[Temperature]] =
     Encoder.instance[UnitOfMeasure[Temperature]](unit =>
-          Json.fromString(unit.symbol))
+      Json.fromString(unit.symbol))
 
   implicit val decodeTemperatureUnitOfMeasure: Decoder[
-      UnitOfMeasure[Temperature]] =
+    UnitOfMeasure[Temperature]] =
     Decoder.instance[UnitOfMeasure[Temperature]] { cursor =>
       for {
         symbol <- cursor.as[String]
         unit <- Xor.fromOption(
-                   Temperature.units.find(_.symbol == symbol),
-                   DecodingFailure("TemperatureScale", cursor.history))
+          Temperature.units.find(_.symbol == symbol),
+          DecodingFailure("TemperatureScale", cursor.history))
       } yield unit
     }
 
@@ -57,8 +57,8 @@ object json {
     }
 
   implicit val encodeTemperatureQuantityRange: ObjectEncoder[
-      QuantityRange[Temperature]] = deriveEncoder[QuantityRange[Temperature]]
+    QuantityRange[Temperature]] = deriveEncoder[QuantityRange[Temperature]]
 
   implicit val decodeTemperatureQuantityRange: Decoder[
-      QuantityRange[Temperature]] = deriveDecoder[QuantityRange[Temperature]]
+    QuantityRange[Temperature]] = deriveDecoder[QuantityRange[Temperature]]
 }

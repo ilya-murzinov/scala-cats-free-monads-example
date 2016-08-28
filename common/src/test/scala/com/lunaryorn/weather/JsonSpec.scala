@@ -34,7 +34,7 @@ class JsonSpec
   import json._
 
   implicit val arbitraryUnitOfMeasureTemperature = Arbitrary(
-      Gen.oneOf(Temperature.units.toSeq))
+    Gen.oneOf(Temperature.units.toSeq))
 
   implicit val arbitraryTemperature = Arbitrary(for {
     // Generate a positive Kelvin value and convert it to the target scale,
@@ -68,8 +68,8 @@ class JsonSpec
     "deserialize from JSON" in {
       forAll { temperature: Temperature =>
         val json = Json.obj(
-            "value" -> temperature.value.asJson,
-            "unit" -> (temperature.unit: UnitOfMeasure[Temperature]).asJson
+          "value" -> temperature.value.asJson,
+          "unit" -> (temperature.unit: UnitOfMeasure[Temperature]).asJson
         )
         json.as[Temperature] mustBe Xor.right(temperature)
       }
@@ -78,8 +78,8 @@ class JsonSpec
     "serialize to JSON" in {
       forAll { temperature: Temperature =>
         temperature.asJson mustBe Json.obj(
-            "value" -> temperature.value.asJson,
-            "unit" -> (temperature.unit: UnitOfMeasure[Temperature]).asJson
+          "value" -> temperature.value.asJson,
+          "unit" -> (temperature.unit: UnitOfMeasure[Temperature]).asJson
         )
       }
     }

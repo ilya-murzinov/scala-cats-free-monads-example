@@ -6,13 +6,16 @@ import de.heikoseeberger.sbtheader.CommentStyleMapping._
 val commonSettings = Seq(
   organization := "com.lunaryorn",
   description := "A toy weather service to demonstrate DI with free monads",
-  homepage := Some(url(s"https://github.com/lunaryorn/scala-free-monads-example")),
+  homepage := Some(
+    url(s"https://github.com/lunaryorn/scala-free-monads-example")),
   startYear := Some(2016),
-  licenses += "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0"),
+  licenses += "Apache-2.0" -> url(
+    "http://www.apache.org/licenses/LICENSE-2.0"),
   scalaVersion := "2.11.8",
   scalacOptions ++= Seq(
     // Code encoding
-    "-encoding", "UTF-8",
+    "-encoding",
+    "UTF-8",
     // Deprecation warnings
     "-deprecation",
     // Warnings about features that should be imported explicitly
@@ -70,8 +73,10 @@ val root = (project in file("."))
 // Validate the project
 val validateCommands = List(
   "clean",
-  "scalafmtTest", "test:scalafmtTest",
-  "compile", "test:compile",
+  "scalafmtTest",
+  "test:scalafmtTest",
+  "compile",
+  "test:compile",
   "test"
 )
 addCommandAlias("validate", validateCommands.mkString(";", ";", ""))

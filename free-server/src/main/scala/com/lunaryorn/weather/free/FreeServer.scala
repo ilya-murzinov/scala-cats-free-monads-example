@@ -19,11 +19,7 @@ package com.lunaryorn.weather.free
 import cats.data.{Xor, XorT}
 import com.lunaryorn.weather.free.dsl.actions.Temperature
 import com.lunaryorn.weather.free.dsl._
-import com.lunaryorn.weather.{
-  InMemoryTemperatureRepository,
-  TemperatureError,
-  TemperatureRangeValidator
-}
+import com.lunaryorn.weather._
 import com.twitter.finagle.Http
 import com.twitter.finagle.http.Status
 import com.twitter.util.Await
@@ -38,8 +34,11 @@ object FreeServer extends App {
   import com.lunaryorn.weather.codecs.encodeException
   import com.lunaryorn.weather.json._
 
-  val weatherService = new TemperatureService(
-    new TemperatureRangeValidator(-100.degreesCelsius to 150.degreesCelsius))
+  val weatherService = {
+    implicit val validate: Validate[TemperatureValidationError, Temperature] =
+      new TemperatureRangeValidator(-100.degreesCelsius to 150.degreesCelsius)
+    new TemperatureService()
+  }
   val repository = new InMemoryTemperatureRepository
 
   type TemperatureEndpoint[T] = Endpoint[TemperatureAction[Output[T]]]

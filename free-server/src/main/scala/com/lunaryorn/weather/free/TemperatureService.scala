@@ -19,14 +19,14 @@ package com.lunaryorn.weather.free
 import cats.data.{Xor, XorT}
 import com.lunaryorn.weather.free.dsl._
 import com.lunaryorn.weather.free.dsl.actions.Temperature._
-import com.lunaryorn.weather.{TemperatureError, TemperatureValidator}
+import com.lunaryorn.weather.{TemperatureError, TemperatureValidationError}
 import squants.Temperature
 
-class TemperatureService(validator: TemperatureValidator) {
+class TemperatureService(implicit validate: Validate[TemperatureValidationError, Temperature]) {
   def addTemperature(temperature: Temperature)
-    : TemperatureAction[Xor[TemperatureError, Temperature]] =
+    : TemperatureAction[TemperatureError Xor Temperature] =
     XorT
-      .fromXor[TemperatureAction](validator.validate(temperature).toXor)
+      .fromXor[TemperatureAction](validate.validate(temperature).toXor)
       .leftMap(TemperatureError.InvalidTemperature)
       .flatMap(
         t =>

@@ -17,13 +17,13 @@
 package com.lunaryorn.weather
 
 import cats.data.Xor
+import com.lunaryorn.weather.prop._
 import io.circe.Json
 import io.circe.syntax._
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{MustMatchers, OptionValues, WordSpec}
 import squants.UnitOfMeasure
-import squants.thermal.{Kelvin, Temperature}
+import squants.thermal.Temperature
 
 class JsonSpec
     extends WordSpec
@@ -32,16 +32,6 @@ class JsonSpec
     with GeneratorDrivenPropertyChecks {
 
   import json._
-
-  implicit val arbitraryUnitOfMeasureTemperature = Arbitrary(
-    Gen.oneOf(Temperature.units.toSeq))
-
-  implicit val arbitraryTemperature = Arbitrary(for {
-    // Generate a positive Kelvin value and convert it to the target scale,
-    // to avoid generating invalid temperatures
-    value <- Gen.posNum[Double]
-    scale <- Gen.oneOf(Temperature.units.toSeq)
-  } yield Kelvin(value).in(scale))
 
   "UnitOfMeasure[Temperature]" must {
     "deserialize from JSON" in {

@@ -16,22 +16,8 @@
 
 package com.lunaryorn.weather.free
 
-import cats.~>
-import com.lunaryorn.weather.TemperatureRepository
-import com.lunaryorn.weather.free.dsl.types.TemperatureAction
-import com.lunaryorn.weather.free.dsl.types.TemperatureAction._
-import com.twitter.util.Future
+import cats.free.Free
 
-object Interpreters {
-
-  def interpretTemperatureActionWithRepository(
-      repo: TemperatureRepository
-  ): TemperatureAction ~> Future =
-    new (TemperatureAction ~> Future) {
-      override def apply[A](action: TemperatureAction[A]): Future[A] =
-        action match {
-          case GetAll => repo.getTemperatures
-          case Store(temperature) => repo.addTemperature(temperature)
-        }
-    }
+package object dsl {
+  type TemperatureAction[T] = Free[types.TemperatureAction, T]
 }

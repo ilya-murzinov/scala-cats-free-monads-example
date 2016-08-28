@@ -17,7 +17,8 @@
 package com.lunaryorn.weather.free
 
 import cats.data.{Xor, XorT}
-import com.lunaryorn.weather.free.TemperatureAction.TemperatureAction
+import com.lunaryorn.weather.free.dsl.actions.Temperature
+import com.lunaryorn.weather.free.dsl._
 import com.lunaryorn.weather.{
   InMemoryTemperatureRepository,
   TemperatureError,

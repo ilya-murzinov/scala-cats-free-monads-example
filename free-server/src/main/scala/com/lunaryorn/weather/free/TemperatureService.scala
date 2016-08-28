@@ -17,9 +17,10 @@
 package com.lunaryorn.weather.free
 
 import cats.data.{Xor, XorT}
+import com.lunaryorn.weather.free.dsl._
+import com.lunaryorn.weather.free.dsl.actions.Temperature._
 import com.lunaryorn.weather.{TemperatureError, TemperatureValidator}
-import com.lunaryorn.weather.free.TemperatureAction._
-import squants.{QuantityRange, Temperature}
+import squants.Temperature
 
 class TemperatureService(validator: TemperatureValidator) {
   def addTemperature(temperature: Temperature)

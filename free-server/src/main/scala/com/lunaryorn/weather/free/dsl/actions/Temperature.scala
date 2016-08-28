@@ -14,28 +14,16 @@
  * limitations under the License.
  */
 
-package com.lunaryorn.weather.free
+package com.lunaryorn.weather.free.dsl.actions
 
-import cats.free.Free
 import cats.free.Free.liftF
+import com.lunaryorn.weather.free.dsl.{types, TemperatureAction}
 import squants.Temperature
 
-sealed trait TemperatureActionT[T]
-
-object TemperatureActionT {
-  case object GetAll extends TemperatureActionT[Seq[Temperature]]
-  case class Store(temperature: Temperature)
-      extends TemperatureActionT[Temperature]
-}
-
-object TemperatureAction {
-  type TemperatureAction[T] = Free[TemperatureActionT, T]
-
+object Temperature {
   val getAll: TemperatureAction[Seq[Temperature]] = liftF(
-      TemperatureActionT.GetAll)
+    types.TemperatureAction.GetAll)
 
   def store(temperature: Temperature): TemperatureAction[Temperature] =
-    liftF(TemperatureActionT.Store(temperature))
-
-  def const[T](t: T): TemperatureAction[T] = Free.pure(t)
+    liftF(types.TemperatureAction.Store(temperature))
 }

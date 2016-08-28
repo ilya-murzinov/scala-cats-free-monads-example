@@ -35,13 +35,13 @@ trait TemperatureService {
 }
 
 trait TemperatureServiceComponent {
-  def weatherService: TemperatureService
+  def temperatureService: TemperatureService
 }
 
 trait TemperatureServiceComponentImpl extends TemperatureServiceComponent {
   self: TemperatureRepositoryComponent with TemperatureValidatorComponent =>
 
-  val temperatureService: TemperatureService = new WeatherServiceImpl
+  override val temperatureService: TemperatureService = new WeatherServiceImpl
 
   private class WeatherServiceImpl extends TemperatureService {
     override def addTemperature(

@@ -22,7 +22,8 @@ import com.lunaryorn.weather.free.dsl.actions.Temperature._
 import com.lunaryorn.weather.{TemperatureError, TemperatureValidationError}
 import squants.Temperature
 
-class TemperatureService(implicit validate: Validate[TemperatureValidationError, Temperature]) {
+class TemperatureService(
+    implicit validate: Validate[TemperatureValidationError, Temperature]) {
   def addTemperature(temperature: Temperature)
     : TemperatureAction[TemperatureError Xor Temperature] =
     XorT

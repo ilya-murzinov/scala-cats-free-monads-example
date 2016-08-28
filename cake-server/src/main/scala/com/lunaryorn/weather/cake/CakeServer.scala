@@ -33,7 +33,7 @@ import squants.thermal._
 
 object CakeServer
     extends App
-    with WeatherServiceComponentImpl
+    with TemperatureServiceComponentImpl
     with InMemoryTemperatureRepositoryComponentImpl
     with TemperatureValidatorComponentImpl {
 

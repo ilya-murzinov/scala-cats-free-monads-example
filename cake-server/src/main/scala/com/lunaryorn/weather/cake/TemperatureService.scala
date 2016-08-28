@@ -34,11 +34,11 @@ trait TemperatureService {
   def getTemperatures: Future[Seq[Temperature]]
 }
 
-trait WeatherServiceComponent {
+trait TemperatureServiceComponent {
   def weatherService: TemperatureService
 }
 
-trait WeatherServiceComponentImpl {
+trait TemperatureServiceComponentImpl extends TemperatureServiceComponent {
   self: TemperatureRepositoryComponent with TemperatureValidatorComponent =>
 
   val temperatureService: TemperatureService = new WeatherServiceImpl

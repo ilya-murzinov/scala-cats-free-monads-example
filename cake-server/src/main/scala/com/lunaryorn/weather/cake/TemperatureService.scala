@@ -51,13 +51,13 @@ trait TemperatureServiceComponentImpl extends TemperatureServiceComponent {
         .leftMap(TemperatureError.InvalidTemperature)
         .flatMap(
           t =>
-            XorT.right(weatherRepository.addTemperature(temperature)): XorT[
+            XorT.right(temperatureRepository.addTemperature(temperature)): XorT[
               Future,
               TemperatureError,
               Temperature])
         .value
 
     override def getTemperatures: Future[Seq[Temperature]] =
-      weatherRepository.getTemperatures
+      temperatureRepository.getTemperatures
   }
 }

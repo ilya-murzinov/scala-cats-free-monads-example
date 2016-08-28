@@ -17,11 +17,11 @@
 package com.lunaryorn.weather
 
 trait TemperatureRepositoryComponent {
-  def weatherRepository: TemperatureRepository
+  def temperatureRepository: TemperatureRepository
 }
 
 trait InMemoryTemperatureRepositoryComponentImpl
     extends TemperatureRepositoryComponent {
-  lazy val weatherRepository: TemperatureRepository =
+  override lazy val temperatureRepository: TemperatureRepository =
     new InMemoryTemperatureRepository
 }

@@ -17,7 +17,7 @@
 package com.lunaryorn.weather
 
 import org.scalacheck.{Arbitrary, Gen}
-import squants.UnitOfMeasure
+import squants.{QuantityRange, UnitOfMeasure}
 import squants.thermal.{Kelvin, Temperature}
 
 object prop {
@@ -31,4 +31,11 @@ object prop {
     scale <- Gen.oneOf(Temperature.units.toSeq)
   } yield Kelvin(value).in(scale))
 
+  implicit val arbitraryQuantityRangeTemperature: Arbitrary[
+    QuantityRange[Temperature]] = Arbitrary(for {
+    bound1 <- Gen.posNum[Double].map(Kelvin(_))
+    bound2 <- Gen.posNum[Double].map(Kelvin(_))
+    min = bound1.min(bound2)
+    max = bound1.max(bound2)
+  } yield min.to(max))
 }

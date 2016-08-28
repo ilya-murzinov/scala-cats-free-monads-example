@@ -37,6 +37,10 @@ val commonSettings = Seq(
     // Fail compilation on warnings
     "-Xfatal-warnings"
   ),
+  libraryDependencies ++= Seq(
+    "org.scalatest" %% "scalatest" % "3.0.0" % "test",
+    "org.scalacheck" %% "scalacheck" % "1.13.2" % "test"
+  ),
   // Automatically update headers
   headers := createFrom(Apache2_0, "2016", "Sebastian Wiesner")
 )
@@ -47,16 +51,18 @@ val common = (project in file("common"))
   .settings(
     name := "weather-common",
     libraryDependencies ++= Seq(
-      "com.squants" %% "squants" % "0.6.2",
-      "org.scalatest" %% "scalatest" % "3.0.0" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.13.2" % "test"
+      "com.squants" %% "squants" % "0.6.2"
     ) ++ Dependencies.circe ++ Dependencies.finch ++ Dependencies.cats
   )
 
 val cakeServer = (project in file("cake-server"))
   .enablePlugins(AutomateHeaderPlugin)
   .settings(commonSettings)
-  .settings(name := "cake-weather-server")
+  .settings(
+    name := "cake-weather-server",
+    libraryDependencies ++= Seq(
+      "org.mockito" % "mockito-core" % "1.10.19" % "test")
+  )
   .dependsOn(common)
 
 val freeServer = (project in file("free-server"))

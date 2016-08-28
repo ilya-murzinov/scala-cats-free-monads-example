@@ -49,12 +49,11 @@ trait TemperatureServiceComponentImpl extends TemperatureServiceComponent {
       XorT
         .fromXor[Future](temperatureValidator.validate(temperature).toXor)
         .leftMap(TemperatureError.InvalidTemperature)
-        .flatMap(
-          t =>
-            XorT.right(temperatureRepository.addTemperature(temperature)): XorT[
-              Future,
-              TemperatureError,
-              Temperature])
+        .flatMap(t =>
+          XorT.right(temperatureRepository.addTemperature(temperature)): XorT[
+            Future,
+            TemperatureError,
+            Temperature])
         .value
 
     override def getTemperatures: Future[Seq[Temperature]] =

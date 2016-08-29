@@ -61,15 +61,16 @@ val cakeServer = (project in file("cake-server"))
   .settings(
     name := "cake-weather-server",
     libraryDependencies ++= Seq(
-      "org.mockito" % "mockito-core" % "1.10.19" % "test")
+      "org.mockito" % "mockito-core" % "1.10.19" % "test"
+    )
   )
-  .dependsOn(common)
+  .dependsOn(common % "compile->compile;test->test")
 
 val freeServer = (project in file("free-server"))
   .enablePlugins(AutomateHeaderPlugin)
   .settings(commonSettings)
   .settings(name := "free-weather-server")
-  .dependsOn(common)
+  .dependsOn(common % "compile->compile;test->test")
 
 val root = (project in file("."))
   .settings(commonSettings)
